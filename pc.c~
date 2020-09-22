@@ -1,0 +1,35 @@
+#include <stdio.h> 
+
+pthread_t Control;
+sem_t data_avail;
+// Do not change the name of this semaphore
+// Declare global variables (common data), for example:
+#define MAXS 10000
+// Maximum no of samples
+// Increase value of MAXS for more samples
+float theta[MAXS];
+// Array for storing motor position
+float ref[MAXS];
+// Array for storing reference input
+Kp = 1.0;
+// Initialize Kp to 1.
+run_time = 10.0; // Set the initial run time to 10 seconds.
+Fs = 200.0;
+// Set the initial sampling frequency to 200 Hz.
+//Set motor_number. // Check your motor module for motor_number.
+//Initialize ref[k] // Initialize the reference input vector ref[k]. 
+int main () 
+{  
+
+    while (1) {
+        switch () {
+            exit(0);
+        default: 
+            printf("Invalid Selection \n");
+            break;
+        }
+    }
+
+
+}
+ 

@@ -1,0 +1,32 @@
+
+/home/al/Documents/Year5Sem2/ELE709/project_2020/task2_1/pc.c,485
+pthread_t Control;9,139
+sem_t data_avail;10,158
+#define MAXS 13,276
+float theta[theta17,367
+float ref[ref18,422
+double Kp,21,504
+double Kp, Fs,21,504
+double Kp, Fs, run_time,21,504
+double Kp, Fs, run_time, magnitude,21,504
+double Kp, Fs, run_time, magnitude, frequency,21,504
+double Kp, Fs, run_time, magnitude, frequency, duty_cycle,21,504
+run_time,22,564
+run_time, motor_position;22,564
+Kp 26,617
+run_time 27,650
+Fs 28,710
+int motor_number 32,875
+int main 37,966
+
+/home/al/Documents/Year5Sem2/ELE709/project_2020/task2_1/ele709project/newload.c,86
+#define NTHREADS 8,121
+#define SIZE 10,142
+void *func(func12,164
+int main(34,577
+
+/home/al/Documents/Year5Sem2/ELE709/project_2020/task2_1/ele709project/dlab_def.h,84
+#define PI 22,390
+#define SCREEN 25,414
+#define PS 26,431
+#define CALLOC(28,449
