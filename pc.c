@@ -4,10 +4,10 @@
 #include <pthread.h>
 #include <malloc.h>
 #include <stdlib.h>
-//#include "dlab.h"
+#include "dlab_def.h"
 
-//pthread_t Control;
-//sem_t data_avail;
+pthread_t con_t;
+sem_t data_avail;
 // Do not change the name of this semaphore
 // Declare global variables (common data), for example:
 #define MAXS 10000 // Maximum no of samples 
@@ -29,10 +29,10 @@ double ek, uk, Kp = 0.0;
 
 
 
-void Control();
+void *Control(void *arg);
 
 
-int  main ()  
+int  main (void)  
 {    
 
 Kp = 1.0; // Initialize Kp to 1.
@@ -46,11 +46,11 @@ int motor_number = 5;//Set motor_number. // Check your motor module for motor_nu
     
 // Initialize the reference input vector ref[k].   
 /* Added Code*/  
-    int k = 0; 
+    int k = 0;  
+    //initializing ref[k]
     for (k = 0; k < MAXS; k++) 
     {  
-        //ref[k] = 55*PI/180.0;
-        ref[k] = 0.0; //KEANU, THIS MIGHT BE WRONG!
+        ref[k] = 0.0; //KEANU, THIS MIGHT BE WRONG! 
     } 
 /* Added Code*/  
 
@@ -60,7 +60,6 @@ char selection = 'a'; //initializaing the selection variable
 char input[10];
     while (1)  
     { 
-        
 /* Added Code*/  
 //do  
 //{ 
@@ -78,28 +77,24 @@ char input[10];
 //while(selection == NULL || selection == " " || selection == "" || selection == '\0');
 
         switch (selection)  
-        { 
+        {  
+
         case 'r': 
             printf("r \n"); 
-            //sem_init(&data_avail,0,0);  
-            /* Added base off of  */ 
-            //#define DLAB_SIMULATE 1
-            //#define DLAB_HARDWARE 0 
-            //extern int Initialize(int, float, int ); 
-           //Initialize(DLAB_SIMULATE, Fs, motor_number);
-            /* Added base off of  */  
-            printf(" \n Creating Pthread \n"); 
-            /* if (pthread_create (&control_thread, NULL, &Control, NULL) != 0) */
-            /* { */
-            /*     printf("Error Creating Control Thread"); */
-            /*     exit (-1); */
-            /* } */  
+            sem_init(&data_avail,0,0);   
+            Initialize(Fs, motor_number); 
 
-			//Joining the control thread
-			//pthread_join(control_thread,NULL);
-			//Terminate(); //DLAB function
-			//sem_destroy(&data_avail);
-            break;
+            printf(" \n Creating Pthread \n"); 
+            if (pthread_create (&con_t, NULL, &Control, NULL) != 0)
+            {
+                printf("Error could not create control thread");
+                exit (-1);
+            }  
+			pthread_join(con_t,NULL);
+			Terminate(); 
+			sem_destroy(&data_avail);
+            break; 
+
         case 'u': 
             printf("u \n");   
             printf(" Choose Step or Square input \n"); 
@@ -109,11 +104,9 @@ char input[10];
 				printf("Enter the Magnitude of Step\n");
 				scanf("%lf",&magnitude);
 				for(k=0;k<MAXS;k++)
-				{
-						/* ref[k]=magnitude*PI/180.0; */ 
-                    ref[k] = 0.0; //THIS COULD BE WRONG
+				{ 
+                    ref[k]=magnitude*PI/180.0;  //converting degrees magnitude to radians
 				}
-				
 			}
 			if (strcmp(input,"square")==0) //Square
 			{
@@ -124,7 +117,7 @@ char input[10];
 				printf("Enter Duty Cycle:\n");
 				scanf("%lf", &duty_cycle);
 				//set up {ref[k]} using DLaB function square()
-				//Square(ref,MAXS,Fs,magnitude*PI/180,frequency,duty_cycle);
+				Square(ref,MAXS,Fs,magnitude*PI/180,frequency,duty_cycle);
 			}
             break;
         case 'p': 
@@ -132,52 +125,46 @@ char input[10];
             printf("Enter a value for Kp \n"); 
             scanf("%lf", &Kp);
             break; 
-
 		case 'f':
-            //New sampling frequency
             printf(" Enter a Frequency :\n");
             scanf("%lf", &Fs);
             break;
 		case 't':
-            //New run time
             printf("Enter Run Time :\n");
             scanf("%lf", &run_time);
             break;
 		case 'g': 
             printf("g \n");
-            //plot(ref,theta,Fs,(int)(run_time*Fs),SCREEN,"Graph","time","y-axis");
+            plot(ref,theta,Fs,(int)(run_time*Fs),SCREEN,"ref and theta vs time","Time","Y-axis");
             break;
 		case 'h':
             printf("h \n");
-            //plot(ref,theta,Fs,(int)(run_time*Fs),PS,"Graph","time","y-axis");
+            plot(ref,theta,Fs,(int)(run_time*Fs),PS,"ref and theta vs time","Time","Y-axis");
             break; 
         case 'q': 
             printf("q \n");  
             exit(0);
             break;
         default: 
-    //        printf("Invalid Selection \n");
+            printf("Invalid Selection \n");
             break;
         } 
     }
 }
  
 
-void Control() 
+void *Control(void *arg) 
 { 
 	k=0;
 	no_of_samples = (int)(run_time*Fs);
 	while(k < no_of_samples)
 	{
-//		sem_wait(&data_avail);
-		//motor_position = EtoR(ReadEncoder());
-
+		sem_wait(&data_avail);
+		motor_position = EtoR(ReadEncoder());
 		//calculate tracking error
 		ek=ref[k] - motor_position;
-		
 		//calculate control value:
 		uk = Kp*ek;
-		
 		//DtoA(VtoD(uk));
 		theta[k] = motor_position;
 		k++;
