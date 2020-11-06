@@ -12,4 +12,4 @@ The objective of this lab was to design and implement a digital PID
 controller to control the position of a DC motor using concurrent
 programming techniques in C via Pthreads. 
 
-*Updates Soon to Come* 
+[[file:Basic_PID/task2_3_tf10.ps]]
